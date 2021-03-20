@@ -99,7 +99,7 @@ except CalledProcessError as exc:
 print(f"=== looking up identity-id")
 
 try:
-    check_call(
+    out = check_output(
         f"security find-identity -v",
         stderr=STDOUT, shell=True,
     )
