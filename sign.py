@@ -51,7 +51,7 @@ tmp_pass = "123456"
 
 try:
     check_call(
-        f"security create-keychain -p {tmp_pass} build.keychain"
+        f"security create-keychain -p {tmp_pass} build.keychain",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
@@ -60,7 +60,7 @@ except CalledProcessError as exc:
 
 try:
     check_call(
-        f"security default-keychain -s build.keychain"
+        f"security default-keychain -s build.keychain",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
@@ -69,7 +69,7 @@ except CalledProcessError as exc:
 
 try:
     check_call(
-        f"security unlock-keychain -p {tmp_pass} build.keychain"
+        f"security unlock-keychain -p {tmp_pass} build.keychain",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
@@ -78,7 +78,7 @@ except CalledProcessError as exc:
 
 try:
     check_call(
-        f"security import {cert_path} -k build.keychain -P {cert_pass} -T /usr/bin/codesign"
+        f"security import {cert_path} -k build.keychain -P {cert_pass} -T /usr/bin/codesign",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
@@ -87,7 +87,7 @@ except CalledProcessError as exc:
 
 try:
     check_call(
-        f"security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k {tmp_pass} build.keychain"
+        f"security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k {tmp_pass} build.keychain",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
@@ -98,7 +98,7 @@ print(f"=== looking up identity-id")
 
 try:
     check_call(
-        f"security find-identity -v"
+        f"security find-identity -v",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
@@ -111,7 +111,7 @@ print(f"=== signing {args.path}")
 
 try:
     check_call(
-        f"codesign --force -s {identity_id} {args.path} -v"
+        f"codesign --force -s {identity_id} {args.path} -v",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
