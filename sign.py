@@ -37,12 +37,14 @@ try:
         f"codesign --verify -d --verbose=2 {args.path}",
         stderr=STDOUT, shell=True
     )
+    print(out.decode())
+    print(f"'{args.path}' is already signed", file=sys.stderr)
+    exit(1)
 except CalledProcessError as exc:
-    print(f"failed to check signature:\n{exc.output.decode()}", file=sys.stderr)
-    raise
-
-# TODO: check that it is not signed yet
-print(out.decode())
+    msg = exc.output.decode()
+    if not "code object is not signed at all" in msg:
+        print(f"failed to check signature:\n{msg}", file=sys.stderr)
+        raise
 
 # NOTE: from https://localazy.com/blog/how-to-automatically-sign-macos-apps-using-github-actions
 print("=== preparing keychain")
