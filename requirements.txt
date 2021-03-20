@@ -1,3 +1,4 @@
+wheel
 wget
 pre-commit
 awscli
