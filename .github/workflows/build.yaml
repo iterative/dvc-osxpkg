@@ -26,8 +26,8 @@ jobs:
       run: python -m wget https://github.com/iterative/dvc/releases/download/${{ steps.latest.outputs.version }}/dvc-${{ steps.latest.outputs.version }}.pkg
     - name: Sign
       env:
-        EXE_ITERATIVE_CERTIFICATE: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE }}
-        EXE_ITERATIVE_CERTIFICATE_PASS: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE_PASS }}
+        OSXPKG_ITERATIVE_CERTIFICATE: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE }}
+        OSXPKG_ITERATIVE_CERTIFICATE_PASS: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE_PASS }}
       run: python sign.py dvc-${{ steps.latest.outputs.version }}.osxpkg
     - name: Upload
       env:
