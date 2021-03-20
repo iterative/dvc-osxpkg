@@ -28,9 +28,9 @@ jobs:
       env:
         OSXPKG_ITERATIVE_CERTIFICATE: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE }}
         OSXPKG_ITERATIVE_CERTIFICATE_PASS: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE_PASS }}
-      run: python sign.py dvc-${{ steps.latest.outputs.version }}.osxpkg
+      run: python sign.py dvc-${{ steps.latest.outputs.version }}.pkg
     - name: Upload
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: python upload.py dvc-${{ steps.latest.outputs.version }}.osxpkg
+      run: python upload.py dvc-${{ steps.latest.outputs.version }}.pkg
