@@ -109,7 +109,7 @@ except CalledProcessError as exc:
 
 print(out.decode())
 
-identity_id = out.decode().split[1]
+identity_id = out.decode().split()[1]
 
 print(f"identity-id: {identity_id}")
 
