@@ -109,6 +109,10 @@ except CalledProcessError as exc:
 
 print(out.decode())
 
+identity_id = out.decode().split[1]
+
+print(f"identity-id: {identity_id}")
+
 print(f"=== signing {args.path}")
 
 try:
