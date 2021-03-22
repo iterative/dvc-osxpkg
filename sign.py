@@ -17,7 +17,7 @@ if not cert:
     print(f"'{CERT_ENV}' env var is required")
     exit(1)
 
-cert_path = "cert.pfx"
+cert_path = "cert.p12"
 with open(cert_path, "wb") as fobj:
     fobj.write(base64.b64decode(cert))
     
