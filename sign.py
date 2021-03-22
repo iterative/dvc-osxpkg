@@ -80,7 +80,7 @@ except CalledProcessError as exc:
 
 try:
     check_call(
-        f"security import {cert_path} -k build.keychain -P {cert_pass} -T /usr/bin/codesign",
+        f"security import {cert_path} -k build.keychain -P {cert_pass} -T /usr/bin/codesign -T /usr/bin/productsign",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
