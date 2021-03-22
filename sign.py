@@ -115,10 +115,11 @@ print(f"identity-id: {identity_id}")
 
 print(f"=== signing {args.path}")
 
-check_call(
-    f"codesign -s --force -vvv {identity_id} {args.path}",
-    stderr=STDOUT, shell=True,
-)
+assert os.system(f"codesign -s --force -vvv {identity_id} {args.path}") == 0
+#check_call(
+#    f"codesign -s --force -vvv {identity_id} {args.path}",
+#    stderr=STDOUT, shell=True,
+#)
 
 print("=== verifying signed executable")
 
