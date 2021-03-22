@@ -117,7 +117,7 @@ print(f"=== signing {args.path}")
 
 try:
     check_call(
-        f"codesign --force -s {identity_id} {args.path} -v",
+        f"codesign -s --force -vvv {identity_id} {args.path}",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
