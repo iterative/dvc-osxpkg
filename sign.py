@@ -115,14 +115,10 @@ print(f"identity-id: {identity_id}")
 
 print(f"=== signing {args.path}")
 
-try:
-    check_call(
-        f"codesign -s --force -vvv {identity_id} {args.path}",
-        stderr=STDOUT, shell=True,
-    )
-except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}")
-    raise
+check_call(
+    f"codesign -s --force -vvv {identity_id} {args.path}",
+    stderr=STDOUT, shell=True,
+)
 
 print("=== verifying signed executable")
 
