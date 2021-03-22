@@ -89,7 +89,7 @@ except CalledProcessError as exc:
 
 try:
     check_call(
-        f"security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k {tmp_pass} build.keychain",
+        f"security set-key-partition-list -S apple-tool:,apple:,codesign:,productsign: -s -k {tmp_pass} build.keychain",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
