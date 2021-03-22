@@ -117,12 +117,15 @@ print(f"=== signing {args.path}")
 
 try:
     check_call(
-        f"productsign --sign {identity_id} {args.path}",
+        f"productsign --sign {identity_id} {args.path} signed.pkg",
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
     print(f"failed to sign:\n{exc.output.decode()}")
     raise
+
+os.unlink(args.path)
+os.rename("signed", args.path)
 
 print("=== verifying signed executable")
 
