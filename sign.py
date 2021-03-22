@@ -14,7 +14,7 @@ args = parser.parse_args()
 
 cert = os.getenv(CERT_ENV)
 if not cert:
-    print(f"'{CERT_ENV}' env var is required", file=sys.stderr)
+    print(f"'{CERT_ENV}' env var is required")
     exit(1)
 
 cert_path = "cert.pfx"
@@ -23,11 +23,11 @@ with open(cert_path, "wb") as fobj:
     
 cert_pass = os.getenv(CERT_PASS_ENV)
 if not cert_pass:
-    print(f"'{CERT_PASS_ENV}' env var is required", file=sys.stderr)
+    print(f"'{CERT_PASS_ENV}' env var is required")
     exit(1)
 
 if not os.path.exists(args.path):
-    print(f"'{args.path}' doesn't exist", file=sys.stderr)
+    print(f"'{args.path}' doesn't exist")
     exit(1)
 
 print("=== checking for existing signature")
@@ -38,12 +38,12 @@ try:
         stderr=STDOUT, shell=True
     )
     print(out.decode())
-    print(f"'{args.path}' is already signed", file=sys.stderr)
+    print(f"'{args.path}' is already signed")
     exit(1)
 except CalledProcessError as exc:
     msg = exc.output.decode()
     if not "code object is not signed at all" in msg:
-        print(f"failed to check signature:\n{msg}", file=sys.stderr)
+        print(f"failed to check signature:\n{msg}")
         raise
 
 # NOTE: from https://localazy.com/blog/how-to-automatically-sign-macos-apps-using-github-actions
@@ -57,7 +57,7 @@ try:
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}", file=sys.stderr)
+    print(f"failed to sign:\n{exc.output.decode()}")
     raise
 
 try:
@@ -66,7 +66,7 @@ try:
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}", file=sys.stderr)
+    print(f"failed to sign:\n{exc.output.decode()}")
     raise
 
 try:
@@ -75,7 +75,7 @@ try:
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}", file=sys.stderr)
+    print(f"failed to sign:\n{exc.output.decode()}")
     raise
 
 try:
@@ -84,7 +84,7 @@ try:
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}", file=sys.stderr)
+    print(f"failed to sign:\n{exc.output.decode()}")
     raise
 
 try:
@@ -93,7 +93,7 @@ try:
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}", file=sys.stderr)
+    print(f"failed to sign:\n{exc.output.decode()}")
     raise
 
 print(f"=== looking up identity-id")
@@ -104,7 +104,7 @@ try:
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}", file=sys.stderr)
+    print(f"failed to sign:\n{exc.output.decode()}")
     raise
 
 print(out.decode())
@@ -121,7 +121,7 @@ try:
         stderr=STDOUT, shell=True,
     )
 except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}", file=sys.stderr)
+    print(f"failed to sign:\n{exc.output.decode()}")
     raise
 
 print("=== verifying signed executable")
@@ -132,7 +132,7 @@ try:
         stderr=STDOUT, shell=True
     )
 except CalledProcessError as exc:
-    print(f"failed to check signature:\n{exc.output.decode()}", file=sys.stderr)
+    print(f"failed to check signature:\n{exc.output.decode()}")
     raise
 
 # TODO: check that it is properly signed
