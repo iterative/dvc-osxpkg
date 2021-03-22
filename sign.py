@@ -34,7 +34,7 @@ print("=== checking for existing signature")
 
 try:
     out = check_output(
-        f"codesign --verify -d --verbose=2 {args.path}",
+        f"pkgutil --check-signature {args.path}",
         stderr=STDOUT, shell=True
     )
     print(out.decode())
@@ -42,7 +42,7 @@ try:
     exit(1)
 except CalledProcessError as exc:
     msg = exc.output.decode()
-    if not "code object is not signed at all" in msg:
+    if not "Status: no signature" in msg:
         print(f"failed to check signature:\n{msg}")
         raise
 
@@ -132,7 +132,7 @@ print("=== verifying signed executable")
 
 try:
     out = check_output(
-        f"codesign --verify -d --verbose=2 {args.path}",
+        f"pkgutil --check-signature {args.path}",
         stderr=STDOUT, shell=True
     )
 except CalledProcessError as exc:
