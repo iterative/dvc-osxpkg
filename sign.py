@@ -20,7 +20,7 @@ check_call(
 
 payload = unpacked / "Payload"
 payload_unpacked = payload.with_suffix(".unpacked")
-
+payload_unpacked.mkdir()
 check_call(
     ["tar", "-xvf", os.fspath(payload), "-C", os.fspath(payload_unpacked)],
     stderr=STDOUT,
