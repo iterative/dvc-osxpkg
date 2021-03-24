@@ -21,6 +21,7 @@ payload = unpacked / "Payload"
 for root, _, fnames in os.walk(payload):
     for fname in fnames:
         path = os.path.join(root, fname)
+        print(f"signing {path}")
         check_call(
             ["codesign", "--force", "-s", args.application_id, path],
             stderr=STDOUT,
