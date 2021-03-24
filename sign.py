@@ -36,6 +36,8 @@ check_call(
         "--force",
         "-s",
         args.application_id,
+        "--options",
+        "runtime",
         "--entitlements",
         "entitlements.plist",
         os.fspath(dvc),
