@@ -28,7 +28,7 @@ check_call(
 
 for root, _, fnames in os.walk(payload_unpacked):
     for fname in fnames:
-        path = root / fname
+        path = os.path.join(root, fname)
         check_call(
             ["codesign", "--force", "-s", args.application_id, path],
             stderr=STDOUT,
