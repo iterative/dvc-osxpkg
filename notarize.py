@@ -21,8 +21,8 @@ config = {
     },
 }
 
-(path / "config.ini").write_text(json.dumps(config))
+(path / "config.json").write_text(json.dumps(config))
 
 check_call(
-    ["gon", "config.ini"], cwd=path, stderr=STDOUT,
+    ["gon", "config.json"], cwd=path, stderr=STDOUT,
 )
