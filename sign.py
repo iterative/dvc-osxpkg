@@ -23,30 +23,19 @@ for root, _, fnames in os.walk(payload):
         path = os.path.join(root, fname)
         print(f"signing {path}")
         check_call(
-            ["codesign", "--force", "-s", args.application_id, path],
+            [
+                "codesign",
+                "--force",
+                "-s",
+                args.application_id,
+                "-o",
+                "runtime",
+                "--entitlements",
+                "entitlements.plist",
+                path,
+            ],
             stderr=STDOUT,
         )
-
-dvc = payload / "usr" / "local" / "lib" / "dvc" / "dvc"
-
-# https://github.com/pyinstaller/pyinstaller/issues/4629
-check_call(
-    [
-        "codesign",
-        "--force",
-        "-s",
-        args.application_id,
-        "--options",
-        "runtime",
-        "--entitlements",
-        "entitlements.plist",
-        os.fspath(dvc),
-    ],
-    stderr=STDOUT,
-)
-
-# make sure dvc still works
-check_call([os.fspath(dvc), "doctor"], stderr=STDOUT)
 
 check_call(
     ["pkgutil", "--flatten", os.fspath(unpacked), os.fspath(pkg)],
