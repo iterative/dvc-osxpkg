@@ -26,6 +26,20 @@ for root, _, fnames in os.walk(payload):
             stderr=STDOUT,
         )
 
+# https://github.com/pyinstaller/pyinstaller/issues/4629
+check_call(
+    [
+        "codesign",
+        "--force",
+        "-s",
+        args.application_id,
+        "---entitlements",
+        "entitlements.plist",
+        os.fspath(payload / "usr" / "local" / "lib" / "dvc" / "dvc"),
+    ],
+    stderr=STDOUT,
+)
+
 check_call(
     ["pkgutil", "--flatten", os.fspath(unpacked), os.fspath(pkg)],
     stderr=STDOUT,
