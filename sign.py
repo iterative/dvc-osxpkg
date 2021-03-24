@@ -27,6 +27,8 @@ for root, _, fnames in os.walk(payload):
             stderr=STDOUT,
         )
 
+dvc = payload / "usr" / "local" / "lib" / "dvc" / "dvc"
+
 # https://github.com/pyinstaller/pyinstaller/issues/4629
 check_call(
     [
@@ -36,10 +38,13 @@ check_call(
         args.application_id,
         "--entitlements",
         "entitlements.plist",
-        os.fspath(payload / "usr" / "local" / "lib" / "dvc" / "dvc"),
+        os.fspath(dvc),
     ],
     stderr=STDOUT,
 )
+
+# make sure dvc still works
+check_call([os.fspath(dvc), "doctor"], stderr=STDOUT)
 
 check_call(
     ["pkgutil", "--flatten", os.fspath(unpacked), os.fspath(pkg)],
