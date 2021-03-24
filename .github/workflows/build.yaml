@@ -34,7 +34,7 @@ jobs:
     - name: Notarize
       env:
         APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-      run: python notarize.py
+      run: python notarize.py dvc-${{ steps.latest.outputs.version }}.pkg
     - name: Upload
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
