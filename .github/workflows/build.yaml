@@ -14,19 +14,7 @@ jobs:
       uses: actions/setup-python@v2.1.4
       with:
         python-version: 3.7
-    - name: Install requirements
-      run: |
-        pip install -r requirements.txt
-        brew install mitchellh/gon/gon
-    - name: Get latest dvc version
-      id: latest
-      shell: bash
-      run: |
-        version=$(./latest.sh)
-        echo "::set-output name=version::$version"
-    - name: Download dvc pkg
-      run: python -m wget https://github.com/iterative/dvc/releases/download/${{ steps.latest.outputs.version }}/dvc-${{ steps.latest.outputs.version }}.pkg
-    - name: Setup certificates
+    - name: Set up certificates
       env:
         ITERATIVE_APPLICATION_CERT: ${{ secrets.ITERATIVE_APPLICATION_CERT }}
         ITERATIVE_APPLICATION_CERT_PASS: ${{ secrets.ITERATIVE_APPLICATION_CERT_PASS }}
@@ -42,6 +30,18 @@ jobs:
         security import installer_cert.p12 -k build.keychain -P $ITERATIVE_INSTALLER_CERT_PASS -T /usr/bin/productsign
         security set-key-partition-list -S 'apple-tool:,apple:,codesign:,productsign:' -s -k 123456 build.keychain
         security find-identity -v
+    - name: Install requirements
+      run: |
+        pip install -r requirements.txt
+        brew install mitchellh/gon/gon
+    - name: Get latest dvc version
+      id: latest
+      shell: bash
+      run: |
+        version=$(./latest.sh)
+        echo "::set-output name=version::$version"
+    - name: Download dvc pkg
+      run: python -m wget https://github.com/iterative/dvc/releases/download/${{ steps.latest.outputs.version }}/dvc-${{ steps.latest.outputs.version }}.pkg
     - name: Sign
       run: python sign.py dvc-${{ steps.latest.outputs.version }}.pkg
     - name: Notarize
