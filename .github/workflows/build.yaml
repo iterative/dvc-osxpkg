@@ -15,7 +15,9 @@ jobs:
       with:
         python-version: 3.7
     - name: Install requirements
-      run: pip install -r requirements.txt
+      run: |
+        pip install -r requirements.txt
+        brew install mitchellh/gon/gon
     - name: Get latest dvc version
       id: latest
       shell: bash
@@ -29,6 +31,10 @@ jobs:
         OSXPKG_ITERATIVE_CERTIFICATE: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE }}
         OSXPKG_ITERATIVE_CERTIFICATE_PASS: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE_PASS }}
       run: python sign.py dvc-${{ steps.latest.outputs.version }}.pkg
+    - name: Notarize
+      env:
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+      run: python notarize.py
     - name: Upload
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
