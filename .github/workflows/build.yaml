@@ -26,10 +26,23 @@ jobs:
         echo "::set-output name=version::$version"
     - name: Download dvc pkg
       run: python -m wget https://github.com/iterative/dvc/releases/download/${{ steps.latest.outputs.version }}/dvc-${{ steps.latest.outputs.version }}.pkg
-    - name: Sign
+    - name: Setup certificates
       env:
-        OSXPKG_ITERATIVE_CERTIFICATE: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE }}
-        OSXPKG_ITERATIVE_CERTIFICATE_PASS: ${{ secrets.OSXPKG_ITERATIVE_CERTIFICATE_PASS }}
+        ITERATIVE_APPLICATION_CERT: ${{ secrets.ITERATIVE_APPLICATION_CERT }}
+        ITERATIVE_APPLICATION_CERT_PASS: ${{ secrets.ITERATIVE_APPLICATION_CERT_PASS }}
+        ITERATIVE_INSTALLER_CERT: ${{ secrets.ITERATIVE_INSTALLER_CERT }}
+        ITERATIVE_INSTALLER_CERT_PASS: ${{ secrets.ITERATIVE_INSTALLER_CERT_PASS }}
+      run: |
+        base64 $ITERATIVE_APPLICATION_CERT > application_cert.p12
+        base64 $ITERATIVE_INSTALLER_CERT > installer_cert.p12
+        security create-keychain -p 123456 build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p 123456 build.keychain
+        security import application_cert.p12 -k build.keychain -P ITERATIVE_APPLICATION_CERT_PASS -T /usr/bin/codesign
+        security import installer_cert.p12 -k build.keychain -P ITERATIVE_INSTALLER_CERT_PASS -T /usr/bin/productsign
+        security set-key-partition-list -S 'apple-tool:,apple:,codesign:,productsign:' -s -k 123456 build.keychain
+        security find-identity -v
+    - name: Sign
       run: python sign.py dvc-${{ steps.latest.outputs.version }}.pkg
     - name: Notarize
       env:

@@ -1,161 +1,73 @@
 import argparse
-import base64
 import os
-from subprocess import STDOUT, CalledProcessError, check_call, check_output
-
-CERT_ENV = "OSXPKG_ITERATIVE_CERTIFICATE"
-CERT_PASS_ENV = "OSXPKG_ITERATIVE_CERTIFICATE_PASS"
+import pathlib
+import shutil
+from subprocess import STDOUT, check_call
 
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path to the osxpkg to sign")
+parser.add_argument("--application-id", required=True)
+parser.add_argument("--installer-id", required=True)
 args = parser.parse_args()
 
-cert = os.getenv(CERT_ENV)
-if not cert:
-    print(f"'{CERT_ENV}' env var is required")
-    exit(1)
+pkg = pathlib.Path(args.path)
+unpacked = pkg.with_suffix(".unpacked")
 
-cert_path = "cert.p12"
-with open(cert_path, "wb") as fobj:
-    fobj.write(base64.b64decode(cert))
+check_call(
+    ["pkgutil", "--expand", os.fspath(pkg), os.fspath(unpacked)],
+    stderr=STDOUT,
+)
 
-cert_pass = os.getenv(CERT_PASS_ENV)
-if not cert_pass:
-    print(f"'{CERT_PASS_ENV}' env var is required")
-    exit(1)
+payload = unpacked / "Payload"
+payload_unpacked = payload.with_suffix(".unpacked")
 
-if not os.path.exists(args.path):
-    print(f"'{args.path}' doesn't exist")
-    exit(1)
+check_call(
+    ["tar", "-xvf", os.fspath(payload), "-C", os.fspath(payload_unpacked)],
+    stderr=STDOUT,
+)
 
-print("=== checking for existing signature")
+for root, _, fnames in os.walk(payload_unpacked):
+    for fname in fnames:
+        path = root / fname
+        check_call(
+            ["codesign", "--force", "-s", args.application_id, path],
+            stderr=STDOUT,
+        )
 
-try:
-    out = check_output(
-        f"pkgutil --check-signature {args.path}", stderr=STDOUT, shell=True
-    )
-    print(out.decode())
-    print(f"'{args.path}' is already signed")
-    exit(1)
-except CalledProcessError as exc:
-    msg = exc.output.decode()
-    if "Status: no signature" not in msg:
-        print(f"failed to check signature:\n{msg}")
-        raise
+check_call(
+    [
+        "tar",
+        "-czvf",
+        os.fspath(payload),
+        "-C",
+        os.fspath(payload_unpacked),
+        ".",
+    ],
+    stderr=STDOUT,
+)
 
-print("=== preparing keychain")
+shutil.rmtree(payload_unpacked)
 
-tmp_pass = "123456"
+check_call(
+    ["pkgutil", "--flatten", os.fspath(unpacked), os.fspath(pkg)],
+    stderr=STDOUT,
+)
 
-try:
-    check_call(
-        f"security create-keychain -p {tmp_pass} build.keychain",
-        stderr=STDOUT,
-        shell=True,
-    )
-except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}")
-    raise
-
-try:
-    check_call(
-        ["security", "default-keychain", "-s", "build.keychain"],
-        stderr=STDOUT,
-    )
-except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}")
-    raise
-
-try:
-    check_call(
-        f"security unlock-keychain -p {tmp_pass} build.keychain",
-        stderr=STDOUT,
-        shell=True,
-    )
-except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}")
-    raise
-
-try:
-    check_call(
-        [
-            "security",
-            "import",
-            cert_path,
-            "-k",
-            "build.keychain",
-            "-P",
-            cert_pass,
-            "-T",
-            "/usr/bin/codesign",
-            "-T",
-            "/usr/bin/productsign",
-        ],
-        stderr=STDOUT,
-    )
-except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}")
-    raise
-
-try:
-    check_call(
-        [
-            "security",
-            "set-key-partition-list",
-            "-S",
-            "apple-tool:,apple:,codesign:,productsign:",
-            "-s",
-            "-k",
-            tmp_pass,
-            "build.keychain",
-        ],
-        stderr=STDOUT,
-    )
-except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}")
-    raise
-
-print("=== looking up identity-id")
-
-try:
-    out = check_output("security find-identity -v", stderr=STDOUT, shell=True,)
-except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}")
-    raise
-
-print(out.decode())
-
-identity_id = out.decode().split()[1]
-
-print(f"identity-id: {identity_id}")
-
-print(f"=== signing {args.path}")
-
-signed = "signed.pkg"
-try:
-    check_call(
-        f"productsign --sign {identity_id} {args.path} {signed}",
-        stderr=STDOUT,
-        shell=True,
-    )
-except CalledProcessError as exc:
-    print(f"failed to sign:\n{exc.output.decode()}")
-    raise
+signed = pkg.with_suffix(".signed")
+check_call(
+    [
+        "productsign",
+        "--sign",
+        args.installer_id,
+        os.fspath(pkg),
+        os.fspath(signed),
+    ],
+    stderr=STDOUT,
+)
 
 os.unlink(args.path)
 os.rename(signed, args.path)
 
-print("=== verifying signed executable")
-
-try:
-    out = check_output(
-        f"pkgutil --check-signature {args.path}", stderr=STDOUT, shell=True
-    )
-except CalledProcessError as exc:
-    print(f"failed to check signature:\n{exc.output.decode()}")
-    raise
-
-# TODO: check that it is properly signed
-print(out.decode())
-
-print(f"=== successfully signed '{args.path}'")
+check_call(
+    ["pkgutil", "--check-signature", os.fspath(pkg)], stderr=STDOUT,
+)
