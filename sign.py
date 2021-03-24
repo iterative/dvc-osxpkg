@@ -34,7 +34,7 @@ check_call(
         "--force",
         "-s",
         args.application_id,
-        "---entitlements",
+        "--entitlements",
         "entitlements.plist",
         os.fspath(payload / "usr" / "local" / "lib" / "dvc" / "dvc"),
     ],
