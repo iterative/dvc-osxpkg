@@ -34,6 +34,7 @@ jobs:
         security find-identity -v
     - name: Install requirements
       run: |
+        pip install wheel
         pip install -r requirements.txt
         brew install mitchellh/gon/gon
     - name: Download dvc pkg
