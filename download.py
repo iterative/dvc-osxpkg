@@ -6,7 +6,7 @@ import tarfile
 
 import wget
 
-VERSION = "98edde06a481cc18727a8c030bc670f7ab43b73f"
+VERSION = "2.0.13"
 URL = f"https://github.com/iterative/dvc/archive/{VERSION}.tar.gz"
 
 path = pathlib.Path(__file__).parent.absolute()
