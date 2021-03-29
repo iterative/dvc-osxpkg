@@ -34,8 +34,8 @@ jobs:
         security find-identity -v
     - name: Check signing
       run: |
-        where codesign
-        where productsign
+        which codesign
+        which productsign
         codesign -f -s 62687162A75C39558A9EA17B57E8C65306BABE92 dvc/setup.py
     - name: Install requirements
       run: |
