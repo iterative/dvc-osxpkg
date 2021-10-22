@@ -21,5 +21,4 @@ except FileNotFoundError:
 repo = git.Repo.clone_from(URL, dvc)
 repo.git.checkout(VERSION)
 
-os.rename(tar.with_name(f"dvc-{VERSION}"), dvc)
 
