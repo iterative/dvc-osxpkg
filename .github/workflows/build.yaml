@@ -3,9 +3,13 @@ on:
   push:
     branches:
     - main
+permissions:
+  contents: read
+  id-token: write
 jobs:
   macos:
     runs-on: macos-10.15
+    environment: aws
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
