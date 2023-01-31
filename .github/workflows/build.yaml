@@ -57,7 +57,7 @@ jobs:
         pip install -r dvc/scripts/build-requirements.txt
         gem install --no-document fpm
     - name: Build and sign
-      timeout-minutes: 35
+      timeout-minutes: 60
       env:
         APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
       run: |
