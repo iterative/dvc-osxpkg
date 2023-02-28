@@ -60,9 +60,3 @@ jobs:
       run: |
         sed -i "" "s/timeout=180/timeout=7200/g" dvc/scripts/pyinstaller/sign.py
         python dvc/scripts/build.py osxpkg --sign-application --application-id 62687162A75C39558A9EA17B57E8C65306BABE92 --sign-installer --installer-id 374191642324A98B1D9835CCD256EDEE2C710051 --notarize --apple-id-username kupruser@gmail.com --apple-id-password $APPLE_ID_PASSWORD
-    - uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-region: us-east-2
-        role-to-assume: arn:aws:iam::260760892802:role/dvc-public-osxpkg-deployer
-    - name: Upload
-      run: python upload.py dvc/scripts/fpm/dvc-*.pkg
