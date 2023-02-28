@@ -52,6 +52,7 @@ jobs:
         # instead.
         pip install ./dvc[all] --no-binary lxml
         pip install -r dvc/scripts/build-requirements.txt
+        pip install "pyinstaller==5.6.2"
         gem install --no-document fpm
     - name: Build and sign
       timeout-minutes: 120
