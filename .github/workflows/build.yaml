@@ -40,4 +40,4 @@ jobs:
     - name: Install requirements
       run: brew install mitchellh/gon/gon
     - name: Build
-      run: python scripts/build.py osxpkg
+      run: python dvc/scripts/build.py osxpkg
