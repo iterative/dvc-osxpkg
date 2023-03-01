@@ -19,14 +19,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: "3.10"
-        cache: pip
-        cache-dependency-path: |
-          requirements.txt
-          dvc/pyproject.toml
-          dvc/scripts/build-requirements.txt
-    - uses: ruby/setup-ruby@v1
+    - name: Set up Ruby 2.6
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '2.6'
+        ruby-version: "2.6"
     - name: Set up certificates
       env:
         ITERATIVE_APPLICATION_CERT: ${{ secrets.ITERATIVE_APPLICATION_CERT }}
@@ -48,7 +44,6 @@ jobs:
         which codesign
         which productsign
         codesign -f -s 62687162A75C39558A9EA17B57E8C65306BABE92 upload.py
-    - run: gem install --no-document fpm
     - name: Install requirements
       run: |
         pip install wheel
@@ -62,7 +57,10 @@ jobs:
         pip install ./dvc[all] --no-binary lxml
         pip install -r dvc/scripts/build-requirements.txt
         gem install --no-document fpm
-    - name: Install requirements
-      run: brew install mitchellh/gon/gon
-    - name: Build
-      run: python dvc/scripts/build.py osxpkg
+    - name: Build and sign
+      timeout-minutes: 120
+      env:
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+      run: |
+        sed -i "" "s/timeout=180/timeout=7200/g" dvc/scripts/pyinstaller/sign.py
+        python dvc/scripts/build.py osxpkg --sign-application --application-id 62687162A75C39558A9EA17B57E8C65306BABE92 --sign-installer --installer-id 374191642324A98B1D9835CCD256EDEE2C710051 --notarize --apple-id-username kupruser@gmail.com --apple-id-password $APPLE_ID_PASSWORD
