@@ -45,7 +45,7 @@ jobs:
         codesign -f -s 62687162A75C39558A9EA17B57E8C65306BABE92 upload.py
     - name: Install requirements
       run: |
-        pip install wheel
+        pip install --upgrade pip wheel setuptools
         pip install -r requirements.txt
         brew install mitchellh/gon/gon
     - name: Download dvc pkg
