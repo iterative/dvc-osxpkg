@@ -27,16 +27,41 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.6'
-    - name: Install fpm
-      run: gem install --no-document fpm
-
-    - name: Install deps
+    - name: Set up certificates
+      env:
+        ITERATIVE_APPLICATION_CERT: ${{ secrets.ITERATIVE_APPLICATION_CERT }}
+        ITERATIVE_APPLICATION_CERT_PASS: ${{ secrets.ITERATIVE_APPLICATION_CERT_PASS }}
+        ITERATIVE_INSTALLER_CERT: ${{ secrets.ITERATIVE_INSTALLER_CERT }}
+        ITERATIVE_INSTALLER_CERT_PASS: ${{ secrets.ITERATIVE_INSTALLER_CERT_PASS }}
       run: |
-        pip install --upgrade pip wheel setuptools
+        echo $ITERATIVE_APPLICATION_CERT | base64 -d > application_cert.p12
+        echo $ITERATIVE_INSTALLER_CERT | base64 -d > installer_cert.p12
+        security create-keychain -p 123456 build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p 123456 build.keychain
+        security import application_cert.p12 -k build.keychain -P $ITERATIVE_APPLICATION_CERT_PASS -T /usr/bin/codesign
+        security import installer_cert.p12 -k build.keychain -P $ITERATIVE_INSTALLER_CERT_PASS -T /usr/bin/productsign
+        security set-key-partition-list -S 'apple-tool:,apple:,codesign:,productsign:' -s -k 123456 build.keychain
+        security find-identity -v
+    - name: Check signing
+      run: |
+        which codesign
+        which productsign
+        codesign -f -s 62687162A75C39558A9EA17B57E8C65306BABE92 upload.py
+    - run: gem install --no-document fpm
+    - name: Install requirements
+      run: |
+        pip install wheel
         pip install -r requirements.txt
-        pip install ./dvc[all]
+        brew install mitchellh/gon/gon
+    - name: Install dvc requirements
+      run: |
+        # available lxml (webdav dependency) wheels are built with an old
+        # SDK, which breaks osxpkg notarization. Building from scratch
+        # instead.
+        pip install ./dvc[all] --no-binary lxml
         pip install -r dvc/scripts/build-requirements.txt
-
+        gem install --no-document fpm
     - name: Install requirements
       run: brew install mitchellh/gon/gon
     - name: Build
