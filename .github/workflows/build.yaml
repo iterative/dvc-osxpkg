@@ -10,7 +10,7 @@ permissions:
   id-token: write
 jobs:
   macos:
-    runs-on: macos-11
+    runs-on: macos-10.15
     environment: aws
     steps:
     - uses: actions/checkout@v3
