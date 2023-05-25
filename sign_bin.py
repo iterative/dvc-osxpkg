@@ -27,21 +27,21 @@ for root, _, fnames in os.walk(dvc):
             continue
 
         fpath = os.path.join(root, fname)
-        try:
-            print(f"checking signature on {fpath}")
-            check_call(
-                [
-                    "codesign",
-                    "--verify",
-                    fpath,
-                ],
-                stderr=STDOUT,
-            )
-            print(f"{fpath} is already signed, skipping...")
-            continue
-        except CalledProcessError:
-            pass
-
+#        try:
+#            print(f"checking signature on {fpath}")
+#            check_call(
+#                [
+#                    "codesign",
+#                    "--verify",
+#                    fpath,
+#                ],
+#                stderr=STDOUT,
+#            )
+#            print(f"{fpath} is already signed, skipping...")
+#            continue
+#        except CalledProcessError:
+#            pass
+#
         print(f"signing {fpath}")
         check_call(
             [
@@ -56,5 +56,6 @@ for root, _, fnames in os.walk(dvc):
                 "entitlements.plist",
                 fpath,
             ],
+            timeout=300,
             stderr=STDOUT,
         )
