@@ -21,21 +21,25 @@ jobs:
       uses: actions/setup-ruby@v1
       with:
         ruby-version: 2.6
-    - name: Set up certificates
-      env:
-        ITERATIVE_APPLICATION_CERT: ${{ secrets.ITERATIVE_APPLICATION_CERT }}
-        ITERATIVE_APPLICATION_CERT_PASS: ${{ secrets.ITERATIVE_APPLICATION_CERT_PASS }}
-        ITERATIVE_INSTALLER_CERT: ${{ secrets.ITERATIVE_INSTALLER_CERT }}
-        ITERATIVE_INSTALLER_CERT_PASS: ${{ secrets.ITERATIVE_INSTALLER_CERT_PASS }}
+
+    - name: Install app certificates
+      id: instcert
+      uses: apple-actions/import-codesign-certs@v2
+      with:
+        p12-file-base64: ${{ secrets.ITERATIVE_APPLICATION_CERT }}
+        p12-password: ${{ secrets.ITERATIVE_APPLICATION_CERT_PASS }}
+
+    - name: Install installer certificates
+      uses: apple-actions/import-codesign-certs@v2
+      with:
+        create-keychain: false 
+        keychain-password: ${{ steps.instcert.keychain-password }}
+        p12-file-base64: ${{ secrets.ITERATIVE_INSTALLER_CERT }}
+        p12-password: ${{ secrets.ITERATIVE_INSTALLER_CERT_PASS }}
+
+    - name: Check certificates
       run: |
-        echo $ITERATIVE_APPLICATION_CERT | base64 -d > application_cert.p12
-        echo $ITERATIVE_INSTALLER_CERT | base64 -d > installer_cert.p12
-        security create-keychain -p 123456 build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p 123456 build.keychain
-        security import application_cert.p12 -k build.keychain -P $ITERATIVE_APPLICATION_CERT_PASS -T /usr/bin/codesign
-        security import installer_cert.p12 -k build.keychain -P $ITERATIVE_INSTALLER_CERT_PASS -T /usr/bin/productsign
-        security set-key-partition-list -S 'apple-tool:,apple:,codesign:,productsign:' -s -k 123456 build.keychain
+        #security set-key-partition-list -S 'apple-tool:,apple:,codesign:,productsign:' -s -k 123456 build.keychain
         security find-identity -v
     - name: Check signing
       run: |
