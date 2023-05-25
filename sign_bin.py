@@ -31,7 +31,7 @@ for root, _, fnames in os.walk(dvc):
     for fname in fnames:
         _, ext = os.path.splitext(fname)
 
-        if ext not in [".so", ".dylib"]:
+        if ext not in [".so"]:#, ".dylib"]:
             continue
 
         fpath = os.path.join(root, fname)
