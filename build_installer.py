@@ -1,19 +1,13 @@
-import argparse
 import os
 import pathlib
 import shutil
 from subprocess import STDOUT, check_call, check_output
 
 path = pathlib.Path(__file__).parent.absolute()
-dvc = path.parent.parent / "dvc"
-pyinstaller = path.parent / "pyinstaller"
+dvc = path / "dvc"
 
 build = path / "build"
 install = build / "usr"
-
-parser = argparse.ArgumentParser()
-parser.add_argument("pkg", choices=["deb", "rpm", "osxpkg"], help="package type")
-args = parser.parse_args()
 
 flags = [
     "--description",
@@ -27,28 +21,19 @@ flags = [
     '"Apache License 2.0"',
 ]
 
-if args.pkg == "osxpkg":
-    install /= "local"
-    bash_dir = install / "etc" / "bash_completion.d"
-    dirs = ["usr"]
-    flags.extend(
-        [
-            "--osxpkg-identifier-prefix",
-            "com.iterative",
-            "--after-install",
-            path / "after-install.sh",
-            "--after-remove",
-            path / "after-remove.sh",
-        ]
-    )
-else:
-    if args.pkg == "rpm":
-        # https://github.com/jordansissel/fpm/issues/1503
-        flags.extend(["--rpm-rpmbuild-define", "_build_id_links none"])
-
-    bash_dir = build / "etc" / "bash_completion.d"
-    dirs = ["usr", "etc"]
-    flags.extend(["--depends", "git >= 1.7.0"])  # needed for gitpython
+install /= "local"
+bash_dir = install / "etc" / "bash_completion.d"
+dirs = ["usr"]
+flags.extend(
+    [
+        "--osxpkg-identifier-prefix",
+        "com.iterative",
+        "--after-install",
+        path / "after-install.sh",
+        "--after-remove",
+        path / "after-remove.sh",
+    ]
+)
 
 try:
     shutil.rmtree(build)
@@ -57,13 +42,7 @@ except FileNotFoundError:
 
 lib = install / "lib"
 lib.mkdir(parents=True)
-shutil.copytree(pyinstaller / "dist" / "dvc", lib / "dvc")
-
-if args.pkg != "osxpkg":
-    # NOTE: in osxpkg fpm replaces symlinks with actual file that it
-    # points to, so we need to use after-install hook.
-    (install / "bin").mkdir()
-    os.symlink("../lib/dvc/dvc", install / "bin" / "dvc")
+shutil.copytree(path / "dist" / "dvc", lib / "dvc")
 
 bash_dir.mkdir(parents=True)
 bash_completion = check_output(
@@ -85,7 +64,7 @@ check_call(
         "fpm",
         "--verbose",
         "-t",
-        args.pkg,
+        "osxpkg",
         *flags,
         "-v",
         version,
