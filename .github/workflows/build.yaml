@@ -70,9 +70,9 @@ jobs:
     - name: Build installer
       run: python build_installer.py
 
-    - name: Sign installer
-      run: python sign_installer.py --installer-id 374191642324A98B1D9835CCD256EDEE2C710051 --keychain build.keychain
-
+#    - name: Sign installer
+#      run: python sign_installer.py --installer-id 374191642324A98B1D9835CCD256EDEE2C710051 --keychain build.keychain
+#
     - name: Notarize installer
       env:
         APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
