@@ -18,6 +18,11 @@ parser.add_argument(
     required=True,
     help="Certificate ID (should be added to the keychain).",
 )
+parser.add_argument(
+    "--keychain",
+    required=False,
+    help="Specify a specific keychain to search for the signing identity.",
+)
 args = parser.parse_args()
 
 path = pathlib.Path(__file__).parent.absolute()
@@ -38,11 +43,17 @@ else:
 
 unsigned = pkg.with_suffix(".unsigned")
 os.rename(pkg, unsigned)
+
+flags = []
+if args.keychain:
+    flags.extend(["--keychain", args.keychain])
+
 check_call(
     [
         "productsign",
         "--sign",
         args.installer_id,
+        *flags,
         os.fspath(unsigned),
         os.fspath(pkg),
     ],
