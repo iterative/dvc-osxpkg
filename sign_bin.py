@@ -13,11 +13,19 @@ parser.add_argument(
     required=True,
     help="Certificate ID (should be added to the keychain).",
 )
+parser.add_argument(
+    "--keychain",
+    required=False,
+    help="Specify a specific keychain to search for the signing identity.",
+)
 args = parser.parse_args()
 
 path = pathlib.Path(__file__).parent.absolute()
 dvc = path / "dist" / "dvc"
 
+flags = []
+if args.keychain:
+    flags.extend(["--keychain", args.keychain])
 
 for root, _, fnames in os.walk(dvc):
     for fname in fnames:
@@ -50,6 +58,7 @@ for root, _, fnames in os.walk(dvc):
                 "--verbose",
                 "-s",
                 args.application_id,
+                *flags,
                 "-o",
                 "runtime",
                 "--entitlements",

@@ -65,7 +65,7 @@ jobs:
         cp -a dvc/scripts/pyinstaller/dist dist
 
     - name: Sign binary
-      run: python sign_bin.py --application-id 62687162A75C39558A9EA17B57E8C65306BABE92
+      run: python sign_bin.py --application-id 62687162A75C39558A9EA17B57E8C65306BABE92 --keychain build.keychain
 
     - name: Build installer
       run: python build_installer.py
