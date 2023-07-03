@@ -9,6 +9,8 @@ entry = dvc / "__main__.py"
 check_call(
     [
         "pyinstaller",
+        "--target-architecture",
+        "universal2",
         "--name",
         "dvc",
         "-y",
