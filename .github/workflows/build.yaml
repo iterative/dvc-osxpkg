@@ -44,6 +44,9 @@ jobs:
     - name: Download dvc pkg
       run: python download.py
 
+    - name: Set pkg type
+      run: echo 'PKG = "osxpkg"' > dvc/dvc/_build.py
+
     - name: Install dvc requirements
       run: |
         # available lxml (webdav dependency) wheels are built with an old
@@ -54,11 +57,10 @@ jobs:
         pip install PyInstaller==5.9.0
         # https://github.com/iterative/dvc/issues/9654
         pip install flufl-lock==7.1.1
+        dvc doctor
 
     - name: Build binary
-      run: |
-        echo 'PKG = "osxpkg"' > dvc/dvc/utils/build.py
-        python build_bin.py
+      run: python build_bin.py
 
     - name: Sign binary
       run: python sign_bin.py --application-id 62687162A75C39558A9EA17B57E8C65306BABE92 --keychain build.keychain
