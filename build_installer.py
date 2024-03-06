@@ -1,4 +1,3 @@
-import os
 import pathlib
 import shutil
 from subprocess import STDOUT, check_call, check_output

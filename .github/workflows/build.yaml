@@ -13,10 +13,10 @@ jobs:
   binary:
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python 3.10
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.10"
 
@@ -69,7 +69,7 @@ jobs:
       run: tar cvf dist.tar.gz dist
 
     - name: Upload binary to artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: binary
         path: dist.tar.gz
@@ -79,15 +79,15 @@ jobs:
     needs: binary
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python 3.10
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.10"
 
     - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.6
 
@@ -117,7 +117,7 @@ jobs:
         gem install --no-document fpm
 
     - name: Download signed binary
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: binary
 
@@ -131,7 +131,7 @@ jobs:
       run: python sign_installer.py --installer-id 374191642324A98B1D9835CCD256EDEE2C710051 --keychain build.keychain
 
     - name: Upload installer to artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: installer
         path: dvc*.pkg
@@ -141,10 +141,10 @@ jobs:
     needs: installer
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python 3.10
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.10"
 
@@ -153,7 +153,7 @@ jobs:
         brew install mitchellh/gon/gon
 
     - name: Download signed installer
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: installer
 
@@ -163,7 +163,7 @@ jobs:
       run: python notarize_installer.py --apple-id-username kupruser@gmail.com --apple-id-password $APPLE_ID_PASSWORD
 
     - name: Upload stapled installer to artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: stapled_installer
         path: dvc*.pkg
@@ -174,10 +174,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: aws
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python 3.10
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.10"
 
@@ -185,11 +185,11 @@ jobs:
       run: pip install awscli
 
     - name: Download signed, notarized and stapled installer
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: stapled_installer
 
-    - uses: aws-actions/configure-aws-credentials@v1
+    - uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-region: us-east-2
         role-to-assume: arn:aws:iam::260760892802:role/dvc-public-osxpkg-deployer
@@ -197,3 +197,17 @@ jobs:
     - name: Upload to aws
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: python upload.py dvc-*.pkg
+
+  notify:
+    if: github.ref == 'refs/heads/main' && failure()
+    needs: [binary, installer, notarize, upload]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_COLOR: ${{ job.status }}
+        SLACK_MESSAGE: 'Package build failed for ${{ github.repository }}'
+        SLACK_TITLE: CI Status
+        SLACK_USERNAME: dvc-pkg-build

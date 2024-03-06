@@ -2,7 +2,7 @@ import argparse
 import os
 import pathlib
 import sys
-from subprocess import STDOUT, check_call, CalledProcessError, TimeoutExpired
+from subprocess import STDOUT, check_call
 
 if sys.platform != "darwin":
     raise NotImplementedError
