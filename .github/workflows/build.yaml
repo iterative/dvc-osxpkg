@@ -150,7 +150,7 @@ jobs:
 
     - name: Install requirements
       run: |
-        brew install mitchellh/gon/gon
+        brew install Bearer/tap/gon
 
     - name: Download signed installer
       uses: actions/download-artifact@v4
