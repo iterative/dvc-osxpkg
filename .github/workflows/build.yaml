@@ -160,7 +160,8 @@ jobs:
     - name: Notarize and staple installer
       env:
         APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-      run: python notarize_installer.py --apple-id-username kupruser@gmail.com --apple-id-password $APPLE_ID_PASSWORD
+        APPLE_ID_PROVIDER: ${{ secrets.APPLE_ID_PROVIDER }}
+      run: python notarize_installer.py --apple-id-username kupruser@gmail.com --apple-id-password $APPLE_ID_PASSWORD --apple-id-provider $APPLE_ID_PROVIDER
 
     - name: Upload stapled installer to artifacts
       uses: actions/upload-artifact@v4

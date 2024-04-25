@@ -24,6 +24,12 @@ parser.add_argument(
         "https://appleid.apple.com/account/manage"
     ),
 )
+parser.add_argument(
+    "--apple-id-provider",
+    required=True,
+    help="The App Store Connect provider when using multiple teams within App Store Connect",
+)
+
 args = parser.parse_args()
 
 path = pathlib.Path(__file__).parent.absolute()
@@ -52,6 +58,7 @@ config = {
     "apple_id": {
         "username": args.apple_id_username,
         "password": args.apple_id_password,
+        "provider": args.apple_id_provider,
     },
 }
 
