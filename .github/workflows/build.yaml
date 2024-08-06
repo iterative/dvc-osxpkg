@@ -54,7 +54,7 @@ jobs:
         # instead.
         pip install ./dvc[all] --no-binary lxml
         # https://github.com/iterative/dvc/issues/7949
-        pip install PyInstaller==5.9.0
+        pip install PyInstaller
         # https://github.com/iterative/dvc/issues/9654
         pip install flufl-lock==7.1.1
         dvc doctor
