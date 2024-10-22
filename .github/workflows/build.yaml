@@ -18,7 +18,7 @@ jobs:
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.11"
 
     - name: Install app certificates
       env:
@@ -62,6 +62,9 @@ jobs:
     - name: Build binary
       run: python build_bin.py
 
+    - run: brew install tree
+    - run: tree dist/
+
     - name: Sign binary
       run: python sign_bin.py --application-id 62687162A75C39558A9EA17B57E8C65306BABE92 --keychain build.keychain
 
@@ -84,7 +87,7 @@ jobs:
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.11"
 
     - name: Set up Ruby 2.6
       uses: ruby/setup-ruby@v1
@@ -146,7 +149,7 @@ jobs:
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.11"
 
     - name: Install requirements
       run: |
@@ -180,7 +183,7 @@ jobs:
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.11"
 
     - name: Install requirements
       run: pip install awscli
