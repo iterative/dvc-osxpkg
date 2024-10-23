@@ -39,7 +39,7 @@ except FileNotFoundError:
 
 lib = install / "lib"
 lib.mkdir(parents=True)
-shutil.copytree(path / "dist" / "dvc", lib / "dvc")
+shutil.copytree(path / "dist" / "dvc", lib / "dvc", symlinks=True)
 
 bash_dir.mkdir(parents=True)
 bash_completion = check_output(
