@@ -53,10 +53,7 @@ jobs:
         # SDK, which breaks osxpkg notarization. Building from scratch
         # instead.
         pip install ./dvc[all] --no-binary lxml
-        # https://github.com/iterative/dvc/issues/7949
-        pip install PyInstaller==6.9.0
-        # https://github.com/iterative/dvc/issues/9654
-        pip install flufl-lock==7.1.1
+        pip install PyInstaller==6.11.0
         dvc doctor
 
     - name: Build binary
