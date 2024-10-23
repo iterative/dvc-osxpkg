@@ -127,6 +127,9 @@ jobs:
     - name: Unpack tar with binary files
       run: tar -xvf dist.tar.gz
 
+    - run: brew install tree
+    - run: tree dist/
+
     - name: Build installer
       run: python build_installer.py
 
