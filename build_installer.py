@@ -1,3 +1,4 @@
+import os
 import pathlib
 import shutil
 from subprocess import STDOUT, check_call, check_output
@@ -39,36 +40,40 @@ except FileNotFoundError:
 
 lib = install / "lib"
 lib.mkdir(parents=True)
-shutil.copytree(path / "dist" / "dvc", lib / "dvc", symlinks=True)
 
-bash_dir.mkdir(parents=True)
-bash_completion = check_output(
-    [lib / "dvc" / "dvc", "completion", "-s", "bash"], text=True
-)
-(bash_dir / "dvc").write_text(bash_completion)
+try:
+    os.rename(path / "dist" / "dvc", lib / "dvc")
 
-zsh_dir = install / "share" / "zsh" / "site-functions"
-zsh_dir.mkdir(parents=True)
-zsh_completion = check_output(
-    [lib / "dvc" / "dvc", "completion", "-s", "zsh"], text=True
-)
-(zsh_dir / "_dvc").write_text(zsh_completion)
+    bash_dir.mkdir(parents=True)
+    bash_completion = check_output(
+        [lib / "dvc" / "dvc", "completion", "-s", "bash"], text=True
+    )
+    (bash_dir / "dvc").write_text(bash_completion)
 
-version = check_output([lib / "dvc" / "dvc", "--version"], text=True).strip()
+    zsh_dir = install / "share" / "zsh" / "site-functions"
+    zsh_dir.mkdir(parents=True)
+    zsh_completion = check_output(
+        [lib / "dvc" / "dvc", "completion", "-s", "zsh"], text=True
+    )
+    (zsh_dir / "_dvc").write_text(zsh_completion)
 
-check_call(
-    [
-        "fpm",
-        "--verbose",
-        "-t",
-        "osxpkg",
-        *flags,
-        "-v",
-        version,
-        "-C",
-        build,
-        *dirs,
-    ],
-    cwd=path,
-    stderr=STDOUT,
-)
+    version = check_output([lib / "dvc" / "dvc", "--version"], text=True).strip()
+
+    check_call(
+        [
+            "fpm",
+            "--verbose",
+            "-t",
+            "osxpkg",
+            *flags,
+            "-v",
+            version,
+            "-C",
+            build,
+            *dirs,
+        ],
+        cwd=path,
+        stderr=STDOUT,
+    )
+finally:
+    os.rename(lib / "dvc", path / "dist" / "dvc")
