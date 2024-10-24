@@ -15,10 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: "3.12"
 
     - name: Install app certificates
       env:
@@ -53,10 +53,7 @@ jobs:
         # SDK, which breaks osxpkg notarization. Building from scratch
         # instead.
         pip install ./dvc[all] --no-binary lxml
-        # https://github.com/iterative/dvc/issues/7949
-        pip install PyInstaller==6.9.0
-        # https://github.com/iterative/dvc/issues/9654
-        pip install flufl-lock==7.1.1
+        pip install PyInstaller==6.11.0
         dvc doctor
 
     - name: Build binary
@@ -81,10 +78,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: "3.12"
 
     - name: Set up Ruby 2.6
       uses: ruby/setup-ruby@v1
@@ -143,10 +140,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: "3.12"
 
     - name: Install requirements
       run: |
@@ -177,10 +174,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: "3.12"
 
     - name: Install requirements
       run: pip install awscli
