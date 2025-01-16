@@ -49,11 +49,7 @@ jobs:
 
     - name: Install dvc requirements
       run: |
-        # available lxml (webdav dependency) wheels are built with an old
-        # SDK, which breaks osxpkg notarization. Building from scratch
-        # instead.
-        pip install ./dvc[all] --no-binary lxml
-        pip install PyInstaller==6.11.0
+        pip install ./dvc[all] PyInstaller==6.11.1
         dvc doctor
 
     - name: Build binary
