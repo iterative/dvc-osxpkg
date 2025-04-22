@@ -68,46 +68,10 @@ jobs:
     - name: Create tar with binary files
       run: tar cvf dist.tar.gz dist
 
-    - name: Upload binary to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: binary
-        path: dist.tar.gz
-        retention-days: 1
-
-  installer:
-    needs: binary
-    runs-on: macos-13
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-
     - name: Set up Ruby 2.6
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.6
-
-    - name: Install installer certificates
-      env:
-        ITERATIVE_INSTALLER_CERT: ${{ secrets.ITERATIVE_INSTALLER_CERT }}
-        ITERATIVE_INSTALLER_CERT_PASS: ${{ secrets.ITERATIVE_INSTALLER_CERT_PASS }}
-      run: |
-        echo $ITERATIVE_INSTALLER_CERT | base64 -d > installer_cert.p12
-        security create-keychain -p 123456 build.keychain
-        # NOTE: signing and steps before it might take longer than default 300 seconds, so we extend the
-        # timeout until the keychain automatically locks again.
-        security set-keychain-settings -lut 3600 build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p 123456 build.keychain
-        security import installer_cert.p12 -k build.keychain -P $ITERATIVE_INSTALLER_CERT_PASS -T /usr/bin/productsign
-        security set-key-partition-list -S 'apple-tool:,apple:,codesign:,productsign:' -s -k 123456 build.keychain
-
-    - name: Check certificates
-      run: security find-identity -v
 
     - name: Install requirements
       run: |
@@ -115,11 +79,6 @@ jobs:
         pip install -r requirements.txt
         gem install --no-document dotenv -v 2.8.1
         gem install --no-document fpm
-
-    - name: Download signed binary
-      uses: actions/download-artifact@v4
-      with:
-        name: binary
 
     - name: Unpack tar with binary files
       run: tar -xvf dist.tar.gz
@@ -150,7 +109,7 @@ jobs:
         retention-days: 1
 
   upload:
-    needs: installer
+    needs: binary
     runs-on: ubuntu-latest
     environment: aws
     steps:
@@ -180,7 +139,7 @@ jobs:
 
   notify:
     if: github.ref == 'refs/heads/main' && failure()
-    needs: [binary, installer, upload]
+    needs: [binary, upload]
     runs-on: ubuntu-latest
     steps:
     - name: Slack Notification
