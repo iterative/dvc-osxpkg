@@ -1,5 +1,6 @@
 import pathlib
 import shutil
+import subprocess
 from subprocess import STDOUT, check_call, check_output
 
 path = pathlib.Path(__file__).parent.absolute()
@@ -39,7 +40,9 @@ except FileNotFoundError:
 
 lib = install / "lib"
 lib.mkdir(parents=True)
-shutil.copytree(path / "dist" / "dvc", lib / "dvc")
+shutil.copytree(path / "dist" / "dvc", lib / "dvc", symlinks=True)
+
+subprocess.run(["ls", "-la", lib / "dvc" / "_internal"])
 
 bash_dir.mkdir(parents=True)
 bash_completion = check_output(
