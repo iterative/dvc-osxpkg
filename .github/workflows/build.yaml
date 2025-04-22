@@ -132,32 +132,9 @@ jobs:
     - name: Sign installer
       run: python sign_installer.py --installer-id 374191642324A98B1D9835CCD256EDEE2C710051 --keychain build.keychain
 
-    - name: Upload installer to artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: installer
-        path: dvc*.pkg
-        retention-days: 1
-
-  notarize:
-    needs: installer
-    runs-on: macos-13
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-
     - name: Install requirements
       run: |
         brew install Bearer/tap/gon
-
-    - name: Download signed installer
-      uses: actions/download-artifact@v4
-      with:
-        name: installer
 
     - name: Notarize and staple installer
       env:
@@ -173,7 +150,7 @@ jobs:
         retention-days: 1
 
   upload:
-    needs: notarize
+    needs: installer
     runs-on: ubuntu-latest
     environment: aws
     steps:
@@ -203,7 +180,7 @@ jobs:
 
   notify:
     if: github.ref == 'refs/heads/main' && failure()
-    needs: [binary, installer, notarize, upload]
+    needs: [binary, installer, upload]
     runs-on: ubuntu-latest
     steps:
     - name: Slack Notification
