@@ -4,13 +4,12 @@ import posixpath
 import sys
 from subprocess import STDOUT, CalledProcessError, check_output
 
-DEST = "s3://dvc-public/dvc-pkgs/osxpkg/"
-
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path to the osxpkg to upload")
+parser.add_argument("dest", help="destination S3 path")
 args = parser.parse_args()
 
-dest = posixpath.join(DEST, os.path.basename(args.path))
+dest = posixpath.join(args.dest, os.path.basename(args.path))
 
 try:
     out = check_output(
