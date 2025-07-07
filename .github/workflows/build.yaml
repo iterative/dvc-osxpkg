@@ -196,7 +196,7 @@ jobs:
         role-to-assume: arn:aws:iam::977611293394:role/dvc-public-osxpkg-deployer
     - name: Upload to aws
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-      run: python upload.py dvc-*.pkg s3://dvc-public/osxpkg/
+      run: python upload.py dvc-*.pkg s3://dvc-packages/osxpkg/
 
   notify:
     if: github.ref == 'refs/heads/main' && failure()
