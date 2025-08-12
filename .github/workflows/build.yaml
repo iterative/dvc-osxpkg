@@ -13,7 +13,7 @@ jobs:
   binary:
     runs-on: macos-13
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v5
@@ -79,7 +79,7 @@ jobs:
     needs: binary
     runs-on: macos-13
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v5
@@ -141,7 +141,7 @@ jobs:
     needs: installer
     runs-on: macos-13
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v5
@@ -175,7 +175,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: aws
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v5
