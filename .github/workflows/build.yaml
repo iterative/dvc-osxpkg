@@ -15,10 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.14
       uses: actions/setup-python@v6
       with:
-        python-version: "3.10"
+        python-version: "3.14"
 
     - name: Install app certificates
       env:
@@ -49,14 +49,7 @@ jobs:
 
     - name: Install dvc requirements
       run: |
-        # available lxml (webdav dependency) wheels are built with an old
-        # SDK, which breaks osxpkg notarization. Building from scratch
-        # instead.
-        pip install ./dvc[all] --no-binary lxml
-        # https://github.com/iterative/dvc/issues/7949
-        pip install PyInstaller==6.14.0
-        # https://github.com/iterative/dvc/issues/9654
-        pip install flufl-lock==7.1.1
+        pip install ./dvc[all] -r ./build-requirements.txt
         dvc doctor
 
     - name: Build binary
@@ -81,10 +74,10 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.14
       uses: actions/setup-python@v6
       with:
-        python-version: "3.10"
+        python-version: "3.14"
 
     - name: Set up Ruby 2.6
       uses: ruby/setup-ruby@v1
@@ -143,10 +136,10 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.14
       uses: actions/setup-python@v6
       with:
-        python-version: "3.10"
+        python-version: "3.14"
 
     - name: Install requirements
       run: |
@@ -177,10 +170,10 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.14
       uses: actions/setup-python@v6
       with:
-        python-version: "3.10"
+        python-version: "3.14"
 
     - name: Install requirements
       run: pip install awscli
@@ -195,7 +188,7 @@ jobs:
         aws-region: us-east-2
         role-to-assume: arn:aws:iam::977611293394:role/dvc-public-osxpkg-deployer
     - name: Upload to aws
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'updated dvc to') }}
       run: python upload.py dvc-*.pkg s3://dvc-packages/osxpkg/
 
   notify:
