@@ -117,7 +117,7 @@ jobs:
         gem install --no-document fpm
 
     - name: Download signed binary
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: binary
 
@@ -153,7 +153,7 @@ jobs:
         brew install Bearer/tap/gon
 
     - name: Download signed installer
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: installer
 
@@ -186,7 +186,7 @@ jobs:
       run: pip install awscli
 
     - name: Download signed, notarized and stapled installer
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v6
       with:
         name: stapled_installer
 
