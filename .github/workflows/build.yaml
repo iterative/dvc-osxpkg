@@ -11,7 +11,11 @@ permissions:
 
 jobs:
   binary:
-    runs-on: macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-13, macos-14]
+    runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v5
 
@@ -64,13 +68,17 @@ jobs:
     - name: Upload binary to artifacts
       uses: actions/upload-artifact@v5
       with:
-        name: binary
+        name: binary-${{ matrix.platform }}
         path: dist.tar.gz
         retention-days: 1
 
   installer:
     needs: binary
-    runs-on: macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-13, macos-14]
+    runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v5
 
@@ -112,7 +120,7 @@ jobs:
     - name: Download signed binary
       uses: actions/download-artifact@v6
       with:
-        name: binary
+        name: binary-${{ matrix.platform }}
 
     - name: Unpack tar with binary files
       run: tar -xvf dist.tar.gz
@@ -126,13 +134,17 @@ jobs:
     - name: Upload installer to artifacts
       uses: actions/upload-artifact@v5
       with:
-        name: installer
+        name: installer-${{ matrix.platform }}
         path: dvc*.pkg
         retention-days: 1
 
   notarize:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-13, macos-14]
     needs: installer
-    runs-on: macos-13
+    runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v5
 
@@ -148,7 +160,7 @@ jobs:
     - name: Download signed installer
       uses: actions/download-artifact@v6
       with:
-        name: installer
+        name: installer-${{ matrix.platform }}
 
     - name: Notarize and staple installer
       env:
@@ -159,13 +171,17 @@ jobs:
     - name: Upload stapled installer to artifacts
       uses: actions/upload-artifact@v5
       with:
-        name: stapled_installer
+        name: stapled_installer-${{ matrix.platform }}
         path: dvc*.pkg
         retention-days: 1
 
   upload:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-13, macos-14]
     needs: notarize
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.platform }}
     environment: aws
     steps:
     - uses: actions/checkout@v5
@@ -181,7 +197,7 @@ jobs:
     - name: Download signed, notarized and stapled installer
       uses: actions/download-artifact@v6
       with:
-        name: stapled_installer
+        name: stapled_installer-${{ matrix.platform }}
 
     - uses: aws-actions/configure-aws-credentials@v5
       with:
