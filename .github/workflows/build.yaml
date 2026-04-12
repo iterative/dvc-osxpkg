@@ -10,6 +10,27 @@ permissions:
   id-token: write
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.published.outputs.exists }}
+    steps:
+    - uses: actions/checkout@v6
+    - name: Read DVC version
+      run: echo "DVC_VERSION=$(grep -oP 'VERSION\s*=\s*\"\K[^\"]+' download.py)" >> "$GITHUB_ENV"
+    - name: Check if version already published
+      id: published
+      run: |
+        code=$(curl -sI -o /dev/null -w '%{http_code}' "https://downloads.dvc.org/osxpkg/dvc-${DVC_VERSION}.pkg")
+        if [ "$code" = "200" ]; then
+          echo "exists=true" >> "$GITHUB_OUTPUT"
+        elif [ "$code" = "403" ]; then
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "::error::Unexpected status $code checking downloads.dvc.org"
+          exit 1
+        fi
+
   binary:
     runs-on: macos-15-intel
     steps:
@@ -164,7 +185,7 @@ jobs:
         retention-days: 1
 
   upload:
-    needs: notarize
+    needs: [check, notarize]
     runs-on: ubuntu-latest
     environment: aws
     steps:
@@ -188,7 +209,7 @@ jobs:
         aws-region: us-east-2
         role-to-assume: arn:aws:iam::977611293394:role/dvc-public-osxpkg-deployer
     - name: Upload to aws
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'updated dvc to') }}
+      if: ${{ needs.check.outputs.published != 'true' && github.ref == 'refs/heads/main' }}
       run: python upload.py dvc-*.pkg s3://dvc-packages/osxpkg/
 
   notify:
