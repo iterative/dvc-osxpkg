@@ -62,7 +62,7 @@ jobs:
         security find-identity -v
 
     - name: Install requirements
-      run: uv pip install -r requirements.txt
+      run: uv pip install -r requirements.txt --system
 
     - name: Download dvc pkg
       run: python download.py
@@ -72,7 +72,7 @@ jobs:
 
     - name: Install dvc requirements
       run: |
-        uv pip install ./dvc[all] -r ./build-requirements.txt
+        uv pip install ./dvc[all] -r ./build-requirements.txt --system
         dvc doctor
 
     - name: Build binary
@@ -131,7 +131,7 @@ jobs:
 
     - name: Install requirements
       run: |
-        uv pip install -r requirements.txt
+        uv pip install -r requirements.txt --system
         gem install --no-document dotenv:2.8.1 fpm:1.17.0
 
     - name: Download signed binary
