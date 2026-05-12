@@ -32,6 +32,7 @@ jobs:
         fi
 
   binary:
+    environment: apple-signing
     runs-on: macos-15-intel
     steps:
     - uses: actions/checkout@v6
@@ -43,8 +44,8 @@ jobs:
 
     - name: Install app certificates
       env:
-        ITERATIVE_APPLICATION_CERT: ${{ secrets.ITERATIVE_APPLICATION_CERT }}
-        ITERATIVE_APPLICATION_CERT_PASS: ${{ secrets.ITERATIVE_APPLICATION_CERT_PASS }}
+        ITERATIVE_APPLICATION_CERT: ${{ secrets.ITERATIVE_APPLICATION_CERT_2031 }}
+        ITERATIVE_APPLICATION_CERT_PASS: ${{ secrets.ITERATIVE_APPLICATION_CERT_PASS_2031 }}
       run: |
         echo $ITERATIVE_APPLICATION_CERT | base64 -d > application_cert.p12
         security create-keychain -p 123456 build.keychain
@@ -77,7 +78,7 @@ jobs:
       run: python build_bin.py
 
     - name: Sign binary
-      run: python sign_bin.py --application-id 62687162A75C39558A9EA17B57E8C65306BABE92 --keychain build.keychain
+      run: python sign_bin.py --application-id 19829808068B6970345E043F20EC84C961848658 --keychain build.keychain
 
     - name: Create tar with binary files
       run: tar cvf dist.tar.gz dist
@@ -91,6 +92,7 @@ jobs:
 
   installer:
     needs: binary
+    environment: apple-signing
     runs-on: macos-15-intel
     steps:
     - uses: actions/checkout@v6
@@ -107,8 +109,8 @@ jobs:
 
     - name: Install installer certificates
       env:
-        ITERATIVE_INSTALLER_CERT: ${{ secrets.ITERATIVE_INSTALLER_CERT }}
-        ITERATIVE_INSTALLER_CERT_PASS: ${{ secrets.ITERATIVE_INSTALLER_CERT_PASS }}
+        ITERATIVE_INSTALLER_CERT: ${{ secrets.ITERATIVE_INSTALLER_CERT_2031 }}
+        ITERATIVE_INSTALLER_CERT_PASS: ${{ secrets.ITERATIVE_INSTALLER_CERT_PASS_2031 }}
       run: |
         echo $ITERATIVE_INSTALLER_CERT | base64 -d > installer_cert.p12
         security create-keychain -p 123456 build.keychain
@@ -142,7 +144,7 @@ jobs:
       run: python build_installer.py
 
     - name: Sign installer
-      run: python sign_installer.py --installer-id 374191642324A98B1D9835CCD256EDEE2C710051 --keychain build.keychain
+      run: python sign_installer.py --installer-id 7FAFECBEEAA60C248558144EB1DAE0C95BAAD171 --keychain build.keychain
 
     - name: Upload installer to artifacts
       uses: actions/upload-artifact@v5
