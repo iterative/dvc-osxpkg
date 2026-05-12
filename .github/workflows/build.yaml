@@ -132,8 +132,7 @@ jobs:
     - name: Install requirements
       run: |
         uv pip install -r requirements.txt
-        gem install --no-document dotenv -v 2.8.1
-        gem install --no-document fpm
+        gem install --no-document dotenv:2.8.1 fpm:1.17.0
 
     - name: Download signed binary
       uses: actions/download-artifact@v6
