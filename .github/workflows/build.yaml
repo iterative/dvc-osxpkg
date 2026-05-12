@@ -42,6 +42,9 @@ jobs:
       with:
         python-version: "3.14"
 
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
     - name: Install app certificates
       env:
         ITERATIVE_APPLICATION_CERT: ${{ secrets.ITERATIVE_APPLICATION_CERT_2031 }}
@@ -59,9 +62,7 @@ jobs:
         security find-identity -v
 
     - name: Install requirements
-      run: |
-        pip install wheel
-        pip install -r requirements.txt
+      run: uv pip install -r requirements.txt
 
     - name: Download dvc pkg
       run: python download.py
@@ -71,7 +72,7 @@ jobs:
 
     - name: Install dvc requirements
       run: |
-        pip install ./dvc[all] -r ./build-requirements.txt
+        uv pip install ./dvc[all] -r ./build-requirements.txt
         dvc doctor
 
     - name: Build binary
@@ -102,6 +103,9 @@ jobs:
       with:
         python-version: "3.14"
 
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
     - name: Set up Ruby 2.6
       uses: ruby/setup-ruby@v1
       with:
@@ -127,8 +131,7 @@ jobs:
 
     - name: Install requirements
       run: |
-        pip install wheel
-        pip install -r requirements.txt
+        uv pip install -r requirements.txt
         gem install --no-document dotenv -v 2.8.1
         gem install --no-document fpm
 
