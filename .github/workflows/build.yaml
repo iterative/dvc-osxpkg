@@ -85,7 +85,7 @@ jobs:
       run: tar cvf dist.tar.gz dist
 
     - name: Upload binary to artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v7
       with:
         name: binary
         path: dist.tar.gz
@@ -149,7 +149,7 @@ jobs:
       run: python sign_installer.py --installer-id 7FAFECBEEAA60C248558144EB1DAE0C95BAAD171 --keychain build.keychain
 
     - name: Upload installer to artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v7
       with:
         name: installer
         path: dvc*.pkg
@@ -182,7 +182,7 @@ jobs:
       run: python notarize_installer.py --apple-id-username ivan@iterative.ai --apple-id-password $APPLE_ID_PASSWORD --apple-id-provider $APPLE_ID_PROVIDER
 
     - name: Upload stapled installer to artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v7
       with:
         name: stapled_installer
         path: dvc*.pkg
